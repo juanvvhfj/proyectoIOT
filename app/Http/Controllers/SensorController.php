@@ -1,12 +1,10 @@
   <?php
 
   namespace App\Http\Controllers;
-
   use App\Models\Sensor;
   use App\Http\Controllers\Controller;
   use Illuminate\Http\Request;
-
-  use App\Models\Department;
+  use App\Models\Departaments;             
 
 
   class SensorController extends Controller
@@ -19,7 +17,7 @@
 
       public function create()
       {
-          $departments = Department::orderBy('name')->get();
+          $departments = Departaments::orderBy('name')->get();
           return view('sensors.create', compact('departments'));
       }
 
@@ -41,5 +39,5 @@
               'status'        => $request->boolean('status'),
           ]);
 
-          return redirect()->route('sensors.index')->with('ok', 'Sensor creado');
-        }
+          return redirect()->route('sensors.index')->with('ok', 'Sensor creado');}
+  
