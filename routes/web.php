@@ -1,7 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\{
+    ContactController,
+    StationController,
+    SensorController,
+    DashboardController,
+    DataApiController,
 
+};
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('layout.index');
-})->name('home');
+Route::get('/', [DashboardController::class, 'index'])->name('home'); // o 'dashboard'
+
+Route::get('/', [DashboardController::class,'index'])->name('dashboard');
+Route::resource('stations', StationController::class)->only(['index','create','store']);
+Route::resource('sensors',  SensorController::class)->only(['index','create','store']);
+Route::get('/telemetry', [DataApiController::class,'series'])->name('api.telemetry'); 

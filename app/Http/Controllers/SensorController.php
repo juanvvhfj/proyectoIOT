@@ -1,85 +1,45 @@
-<?php
+  <?php
 
-namespace App\Http\Controllers;
+  namespace App\Http\Controllers;
 
-use App\Models\Station;
-use Illuminate\Http\Request;
+  use App\Models\Sensor;
+  use App\Http\Controllers\Controller;
+  use Illuminate\Http\Request;
 
-class SensorController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+  use App\Models\Department;
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+  class SensorController extends Controller
+  {
+      public function index()
+      {
+          $sensors = Sensor::with('department.country')->paginate(10);
+          return view('sensors.index', compact('sensors'));
+      }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Station  $station
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Station $station)
-    {
-        //
-    }
+      public function create()
+      {
+          $departments = Department::orderBy('name')->get();
+          return view('sensors.create', compact('departments'));
+      }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Station  $station
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Station $station)
-    {
-        //
-    }
+      public function store(Request $request)
+      {
+          $data = $request->validate([
+              'name'          => 'required',
+              'code'          => 'required|unique:sensors,code',
+              'abbrev'        => 'nullable',
+              'id_department' => 'required|exists:departments,id',
+              'status'        => 'nullable'
+          ]);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Station  $station
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Station $station)
-    {
-        //
-    }
+          Sensor::create([
+              'name'          => $data['name'],
+              'code'          => $data['code'],
+              'abbrev'        => $data['abbrev'] ?? null,
+              'id_department' => $data['id_department'],
+              'status'        => $request->boolean('status'),
+          ]);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Station  $station
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Station $station)
-    {
-        //
-    }
-}
+          return redirect()->route('sensors.index')->with('ok', 'Sensor creado');
+        }
